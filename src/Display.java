@@ -125,6 +125,12 @@ class Panel extends JPanel implements ActionListener, KeyListener {
                     velocityX = velocityX - 1;
                 }
                 break;
+            case KeyEvent.VK_R :
+                coordinateX = 268;
+                coordinateY = 100;
+                velocityX = 0;
+                velocityY = 0;
+                break;
         }
     }
 
