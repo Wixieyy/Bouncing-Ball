@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 class Display extends JFrame {
     Panel panel;
@@ -27,11 +29,11 @@ class Panel extends JPanel implements ActionListener, KeyListener {
     final int PANEL_HEIGHT = 500;
     Image circle;
     Timer timer;
-    int velocityX = 0;
+    ArrayList<Integer> velocityX = new ArrayList<>(Arrays.asList(0));
     int velocityY = 0;
-    int coordinateX = 268;
-    int coordinateY = 100;
-    int gravity = 1;
+    ArrayList<Integer> coordinateX = new ArrayList<>(Arrays.asList(268));
+    ArrayList<Integer> coordinateY = new ArrayList<>(Arrays.asList(100));
+    ArrayList<Integer> gravity = new ArrayList<>(Arrays.asList(1));
     int frames = 0;
     double collisionDamping = 1;
     long startTime = System.currentTimeMillis();
@@ -57,7 +59,16 @@ class Panel extends JPanel implements ActionListener, KeyListener {
         g2D.setStroke(new BasicStroke(3));
         g2D.drawRect(50, 50, 500, 484);
         g2D.fillRect(50, 50, 500, 484);
-        g2D.drawImage(circle, coordinateX, coordinateY, null);
+        for (int i = 0; i < coordinateX.size(); i++) {
+            g2D.drawImage(circle, coordinateX.get(i), coordinateY.get(i), null);
+        }
+    }
+
+    public void addCircle() {
+        coordinateX.add(268);
+        coordinateY.add(100);
+        gravity.add(1);
+        velocityX.add(0);
     }
 
     private double fpsCounter() {
@@ -76,17 +87,19 @@ class Panel extends JPanel implements ActionListener, KeyListener {
         int imageHeight = circle.getHeight(null) / 2;
         int imageWidth = circle.getWidth(null) / 2;
 
-        if (coordinateY + imageHeight >= PANEL_HEIGHT) {
-            gravity = (int) (Math.abs(gravity + velocityY) * -1 * collisionDamping);
-        } else {
-            gravity++;
-        }
-        coordinateY = coordinateY + gravity;
+        for (int i = 0; i < coordinateX.size(); i++) {
+            if (coordinateY.get(i) + imageHeight >= PANEL_HEIGHT) {
+                gravity.set(i, (int) (Math.abs(gravity.get(i) + velocityY) * -1 * collisionDamping));
+            } else {
+                gravity.set(i, gravity.get(i) + 1);
+            }
+            coordinateY.set(i, coordinateY.get(i) + gravity.get(i));
 
-        if (coordinateX <= 45 || coordinateX + imageWidth >= PANEL_WIDTH + 25) {
-            velocityX = velocityX * -1;
+            if (coordinateX.get(i) <= 45 || coordinateX.get(i) + imageWidth >= PANEL_WIDTH + 25) {
+                velocityX.set(i, velocityX.get(i) * -1);
+            }
+            coordinateX.set(i, coordinateX.get(i) + velocityX.get(i));
         }
-        coordinateX = coordinateX + velocityX;
 
         frames++;
         if (frames % 10 == 0) {
@@ -105,31 +118,32 @@ class Panel extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         switch (key) {
-            case KeyEvent.VK_D:
+            case KeyEvent.VK_W:
                 collisionDamping = Math.min(collisionDamping + 0.01, 1);
                 break;
-            case KeyEvent.VK_A:
+            case KeyEvent.VK_S:
                 collisionDamping = Math.max(collisionDamping - 0.01, 0);
                 break;
-            case KeyEvent.VK_W:
-                if (velocityX < 0) {
-                    velocityX = velocityX - 1;
-                } else {
-                    velocityX = velocityX + 1;
+            case KeyEvent.VK_D:
+                for (int i = 0; i < velocityX.size(); i++) {
+                    velocityX.set(i, velocityX.get(i) + 1);
                 }
                 break;
-            case KeyEvent.VK_S:
-                if (velocityX < 0) {
-                    velocityX = velocityX + 1;
-                } else {
-                    velocityX = velocityX - 1;
+            case KeyEvent.VK_A:
+                for (int i = 0; i < velocityX.size(); i++) {
+                    velocityX.set(i, velocityX.get(i) - 1);
                 }
                 break;
-            case KeyEvent.VK_R :
-                coordinateX = 268;
-                coordinateY = 100;
-                velocityX = 0;
+            case KeyEvent.VK_R:
+                coordinateX = new ArrayList<>(Arrays.asList(268));
+                coordinateY = new ArrayList<>(Arrays.asList(100));
+                gravity = new ArrayList<>(Arrays.asList(1));
+                velocityX = new ArrayList<>(Arrays.asList(0));
                 velocityY = 0;
+                collisionDamping = 1;
+                break;
+            case KeyEvent.VK_C:
+                addCircle();
                 break;
         }
     }
