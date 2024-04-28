@@ -71,6 +71,23 @@ class Panel extends JPanel implements ActionListener, KeyListener {
         velocityX.add(0);
     }
 
+    private void checkCollision() {
+        int radius = circle.getWidth(null) / 2;
+        for (int i = 0; i < coordinateX.size(); i++) {
+            for (int j = i + 1; j < coordinateX.size(); j++) {
+                int dx = coordinateX.get(i) - coordinateX.get(j);
+                int dy = coordinateY.get(i) - coordinateY.get(j);
+                int distance = (int) Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < radius * 2) {
+//                    velocityX.set(i, velocityX.get(i) * -1);
+//                    velocityX.set(j, velocityX.get(j) * -1);
+                    System.out.println("Collision");
+                }
+            }
+        }
+    }
+
     private double fpsCounter() {
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - startTime;
@@ -100,6 +117,8 @@ class Panel extends JPanel implements ActionListener, KeyListener {
             }
             coordinateX.set(i, coordinateX.get(i) + velocityX.get(i));
         }
+
+        checkCollision();
 
         frames++;
         if (frames % 10 == 0) {
